@@ -278,13 +278,20 @@ export default function StockDetailPage({ params }: PageProps) {
             <div className="stat-value mono">{stats.total_shares > 0 ? formatCurrency(stats.total_invested) : '—'}</div>
           </div>
           <div className="stat-card">
-            <div className="stat-label">ปันผลรวมคาดการณ์</div>
+            <div className="stat-label">อัตราปันผลคาดการณ์</div>
             <div className="stat-value green mono">
               {stats.dividend_yield_pct > 0 ? `${formatNumber(stats.dividend_yield_pct)}%` : '—'}
             </div>
             <div className="stat-sub">
-              ฿{formatNumber(raw.dividend_per_share, 4)}/หุ้น · รวม {formatCurrency(stats.total_dividend)}
+              ฿{formatNumber(raw.dividend_per_share, 4)}/หุ้น
             </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-label">ปันผลรวมคาดการณ์</div>
+            <div className="stat-value green mono">
+              {stats.total_shares > 0 && stats.total_dividend > 0 ? formatCurrency(stats.total_dividend) : '—'}
+            </div>
+            <div className="stat-sub">ต่อปี (จากหุ้นปัจจุบัน)</div>
           </div>
           <div className="stat-card">
             <div className="stat-label">กำไรสุทธิคาดการณ์</div>
