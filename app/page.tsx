@@ -58,7 +58,7 @@ export default function DashboardPage() {
         case 'profit_asc':
           return a.expected_profit - b.expected_profit;
         case 'yield_desc':
-          return (b.div_yield || 0) - (a.div_yield || 0);
+          return (b.dividend_yield_pct || 0) - (a.dividend_yield_pct || 0);
         case 'created_desc':
         default:
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
