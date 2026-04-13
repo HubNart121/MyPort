@@ -12,7 +12,9 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  LabelList
+  LabelList,
+  ComposedChart,
+  Line
 } from 'recharts';
 
 const COLORS = [
@@ -47,8 +49,10 @@ export function DashboardCharts({ portData, sectorData, assetData, stackedData }
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
-      // For Stacked Bar, showing multiple contents or just total
-      const isStacked = payload.length > 1;
+      // Filter out 'total' from the payload map to avoid showing it as a sector
+      const sectors = payload.filter((item: any) => item.dataKey !== 'total');
+      const isStacked = sectors.length > 1;
+      
       return (
         <div style={{ 
           background: 'var(--bg-secondary)', 
@@ -60,8 +64,8 @@ export function DashboardCharts({ portData, sectorData, assetData, stackedData }
           <div className="mono" style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>
             {payload[0].payload.name}
           </div>
-          {payload.map((item: any, i: number) => (
-            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', marginBottom: i === payload.length - 1 ? 0 : '4px' }}>
+          {sectors.map((item: any, i: number) => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', marginBottom: i === sectors.length - 1 ? 0 : '4px' }}>
               <span className="mono" style={{ fontSize: '11px', color: item.color || item.fill }}>{item.name}:</span>
               <span className="mono" style={{ fontSize: '11px', fontWeight: 700 }}>
                 ฿{item.value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
@@ -83,24 +87,19 @@ export function DashboardCharts({ portData, sectorData, assetData, stackedData }
   };
 
   const renderTotalLabel = (props: any) => {
-    const { x, y, width, value, payload } = props;
-    if (!payload || !payload.total) return null;
+    const { x, y, width, value } = props;
+    if (value === undefined || value === null) return null;
     
-    // We only want to render the label ONCE per bar group.
-    // However, LabelList on a stacked Bar runs for every segment.
-    // So we'll need a trick or just use the Tooltip.
-    // Actually, Recharts version and behavior varies.
-    // Let's use a simpler approach: only the last sector rendered gets the label.
     return (
       <text 
-        x={x + width / 2} 
-        y={y - 10} 
+        x={x} 
+        y={y - 12} 
         fill="var(--amber)" 
         textAnchor="middle" 
         className="mono"
-        style={{ fontSize: '11px', fontWeight: 700 }}
+        style={{ fontSize: '12px', fontWeight: 700 }}
       >
-        ฿{(payload.total / 1000).toFixed(0)}k
+        ฿{(value / 1000).toFixed(0)}k
       </text>
     );
   };
@@ -116,9 +115,9 @@ export function DashboardCharts({ portData, sectorData, assetData, stackedData }
           </div>
           <div style={{ height: '350px', width: '100%', padding: '24px 20px 10px' }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart
+              <ComposedChart
                 data={stackedData.data}
-                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                margin={{ top: 30, right: 30, left: 20, bottom: 20 }}
                 barSize={60}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
@@ -154,18 +153,23 @@ export function DashboardCharts({ portData, sectorData, assetData, stackedData }
                     stackId="a" 
                     fill={COLORS[index % COLORS.length]} 
                     radius={index === stackedData.sectors.length - 1 ? [2, 2, 0, 0] : [0, 0, 0, 0]}
-                  >
-                    {/* Only the last bar shows the total at the top to avoid overlap */}
-                    {index === stackedData.sectors.length - 1 && (
-                      <LabelList 
-                        dataKey="total" 
-                        position="top" 
-                        content={renderTotalLabel}
-                      />
-                    )}
-                  </Bar>
+                    animationDuration={500}
+                  />
                 ))}
-              </BarChart>
+                
+                {/* Invisible Line to provide the total labels at the "fingertips" */}
+                <Line 
+                  type="monotone" 
+                  dataKey="total" 
+                  stroke="none" 
+                  dot={false} 
+                  activeDot={false}
+                  legendType="none"
+                  isAnimationActive={false}
+                >
+                  <LabelList content={renderTotalLabel} />
+                </Line>
+              </ComposedChart>
             </ResponsiveContainer>
           </div>
         </div>
