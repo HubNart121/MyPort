@@ -42,7 +42,18 @@ interface DashboardChartsProps {
   };
 }
 
+import { useState, useEffect } from 'react';
+
 export function DashboardCharts({ portData, sectorData, assetData, stackedData }: DashboardChartsProps) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const hasData = portData.length > 0 || sectorData.length > 0 || assetData.length > 0;
 
   if (!hasData) return null;
@@ -113,36 +124,37 @@ export function DashboardCharts({ portData, sectorData, assetData, stackedData }
           <div className="panel-header">
             <div className="panel-title">ยอดเงินลงทุนแยกตามประเภทพอร์ตและกลุ่มอุตสาหกรรม (Stacked Bar)</div>
           </div>
-          <div style={{ height: '350px', width: '100%', padding: '24px 20px 10px' }}>
+          <div style={{ height: isMobile ? '400px' : '350px', width: '100%', padding: isMobile ? '10px 5px' : '24px 20px 10px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart
                 data={stackedData.data}
-                margin={{ top: 30, right: 30, left: 20, bottom: 20 }}
-                barSize={60}
+                margin={{ top: isMobile ? 50 : 30, right: isMobile ? 10 : 30, left: isMobile ? -10 : 20, bottom: isMobile ? 40 : 20 }}
+                barSize={isMobile ? 35 : 60}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                 <XAxis 
                   dataKey="name" 
                   stroke="var(--text-muted)" 
-                  fontSize={12} 
+                  fontSize={isMobile ? 10 : 12} 
                   tickLine={false}
                   axisLine={{ stroke: 'var(--border)' }}
                   className="mono uppercase"
                 />
                 <YAxis 
                   stroke="var(--text-muted)" 
-                  fontSize={10}
+                  fontSize={isMobile ? 9 : 10}
                   tickLine={false}
                   axisLine={{ stroke: 'var(--border)' }}
                   tickFormatter={(value) => `฿${(value / 1000)}k`}
                   className="mono"
+                  width={isMobile ? 40 : 60}
                 />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--bg-hover)', opacity: 0.4 }} />
                 <Legend 
-                  verticalAlign="top" 
-                  align="right"
+                  verticalAlign={isMobile ? "bottom" : "top"} 
+                  align={isMobile ? "center" : "right"}
                   iconType="rect"
-                  wrapperStyle={{ paddingBottom: '20px' }}
+                  wrapperStyle={isMobile ? { paddingTop: '20px' } : { paddingBottom: '20px' }}
                   formatter={(value) => <span style={{ color: 'var(--text-secondary)', fontSize: '10px', fontFamily: 'Space Mono', textTransform: 'uppercase' }}>{value}</span>}
                 />
                 {stackedData.sectors.map((sector, index) => (
