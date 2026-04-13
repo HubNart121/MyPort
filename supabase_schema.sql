@@ -93,3 +93,23 @@ CREATE POLICY "Enable all access for informations" ON informations
   FOR ALL
   USING (true)
   WITH CHECK (true);
+
+-- 9. Create auth_config table for simple authentication
+CREATE TABLE IF NOT EXISTS auth_config (
+  id INTEGER PRIMARY KEY CHECK (id = 1), -- Ensure only one record exists
+  username TEXT NOT NULL DEFAULT 'admin',
+  password TEXT NOT NULL DEFAULT 'admin',
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE auth_config ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Enable all access for auth_config" ON auth_config
+  FOR ALL
+  USING (true)
+  WITH CHECK (true);
+
+-- Seed initial admin user if not exists
+INSERT INTO auth_config (id, username, password) 
+VALUES (1, 'admin', 'admin')
+ON CONFLICT (id) DO NOTHING;

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { logout } from '@/lib/auth';
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: '◈' },
@@ -11,6 +12,12 @@ const navItems = [
   { href: '/info', label: 'คลังความรู้ (Inf.)', icon: 'ℹ' },
   { href: '/backup', label: 'Backup / Restore', icon: '⊡' },
 ];
+
+export function SidebarWrapper() {
+  const pathname = usePathname();
+  if (pathname === '/login') return null;
+  return <Sidebar />;
+}
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -43,10 +50,32 @@ export function Sidebar() {
         })}
       </div>
 
-      <div style={{ flex: 1 }} />
+      <div className="nav-section" style={{ marginTop: 'auto' }}>
+        <div className="nav-section-label">System</div>
+        <Link 
+          href="/settings" 
+          className={`nav-item ${pathname === '/settings' ? 'active' : ''}`}
+        >
+          <span className="mono" style={{ fontSize: '12px', width: '14px', textAlign: 'center' }}>⚙</span>
+          Change User/Pass
+        </Link>
+        <button 
+          onClick={() => {
+            if (confirm('ต้องการออกจากระบบใช่หรือไม่?')) {
+              logout();
+            }
+          }}
+          className="nav-item"
+          style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--red)' }}
+        >
+          <span className="mono" style={{ fontSize: '12px', width: '14px', textAlign: 'center' }}>⎋</span>
+          Logout
+        </button>
+      </div>
+
       <div style={{ padding: '16px 20px', borderTop: '1px solid var(--border)' }}>
         <div style={{ fontSize: '10px', color: 'var(--text-muted)', lineHeight: 1.8 }}>
-          <div>PORT_TRACK v1.0</div>
+          <div>PORT_TRACK v1.1</div>
           <div>Powered by Supabase</div>
         </div>
       </div>
