@@ -146,7 +146,7 @@ export function BuyRoundTable({
             </table>
 
             {/* Mobile Card List */}
-            <div className="mobile-only-flex" style={{ flexDirection: 'column', gap: '8px', padding: '12px' }}>
+            <div className="mobile-only-flex" style={{ display: 'none', flexDirection: 'column', gap: '8px', padding: '12px' }}>
               {rounds.map((r, i) => {
                 const runningShares = rounds.slice(0, i + 1).reduce((a, x) => a + x.shares, 0);
                 const runningInvested = rounds.slice(0, i + 1).reduce((a, x) => a + x.price * x.shares, 0);
