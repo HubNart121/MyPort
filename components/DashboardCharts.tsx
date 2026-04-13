@@ -75,14 +75,18 @@ export function DashboardCharts({ portData, sectorData, assetData, stackedData }
           <div className="mono" style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>
             {payload[0].payload.name}
           </div>
-          {sectors.map((item: any, i: number) => (
-            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', marginBottom: i === sectors.length - 1 ? 0 : '4px' }}>
-              <span className="mono" style={{ fontSize: '11px', color: item.color || item.fill }}>{item.name}:</span>
-              <span className="mono" style={{ fontSize: '11px', fontWeight: 700 }}>
-                ฿{item.value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-              </span>
-            </div>
-          ))}
+          {sectors.map((item: any, i: number) => {
+            const totalValue = sectors.reduce((sum: number, entry: any) => sum + (entry.value || 0), 0);
+            return (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', marginBottom: i === sectors.length - 1 ? 0 : '4px' }}>
+                <span className="mono" style={{ fontSize: '11px', color: item.color || item.fill }}>{item.name}:</span>
+                <span className="mono" style={{ fontSize: '11px', fontWeight: 700 }}>
+                  ฿{item.value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  {totalValue > 0 && ` (${((item.value / totalValue) * 100).toFixed(1)}%)`}
+                </span>
+              </div>
+            );
+          })}
           {isStacked && (
             <div style={{ marginTop: '8px', paddingTop: '4px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', gap: '16px' }}>
               <span className="mono" style={{ fontSize: '11px', color: 'var(--text-primary)', fontWeight: 700 }}>TOTAL:</span>
@@ -111,6 +115,29 @@ export function DashboardCharts({ portData, sectorData, assetData, stackedData }
         style={{ fontSize: '12px', fontWeight: 700 }}
       >
         ฿{(value / 1000).toFixed(0)}k
+      </text>
+    );
+  };
+
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }: any) => {
+    const RADIAN = Math.PI / 180;
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    if (percent < 0.05) return null; // Don't show labels for very small slices
+
+    return (
+      <text 
+        x={x} 
+        y={y} 
+        fill="white" 
+        textAnchor="middle" 
+        dominantBaseline="central"
+        className="mono"
+        style={{ fontSize: '10px', fontWeight: 700, pointerEvents: 'none' }}
+      >
+        {`${(percent * 100).toFixed(0)}%`}
       </text>
     );
   };
@@ -206,6 +233,8 @@ export function DashboardCharts({ portData, sectorData, assetData, stackedData }
                     paddingAngle={5}
                     dataKey="value"
                     stroke="none"
+                    label={renderCustomizedLabel}
+                    labelLine={false}
                   >
                     {portData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -241,6 +270,8 @@ export function DashboardCharts({ portData, sectorData, assetData, stackedData }
                     paddingAngle={5}
                     dataKey="value"
                     stroke="none"
+                    label={renderCustomizedLabel}
+                    labelLine={false}
                   >
                     {sectorData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
@@ -276,6 +307,8 @@ export function DashboardCharts({ portData, sectorData, assetData, stackedData }
                     paddingAngle={5}
                     dataKey="value"
                     stroke="none"
+                    label={renderCustomizedLabel}
+                    labelLine={false}
                   >
                     {assetData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[(index + 4) % COLORS.length]} />
