@@ -26,6 +26,7 @@ export default function DashboardPage() {
   const [filterType, setFilterType] = useState<AssetType | 'All'>('All');
   const [filterPort, setFilterPort] = useState<PortType | 'All'>('All');
   const [activeSort, setActiveSort] = useState<string>('created_desc');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const { data: rawStocks = [], isLoading, error } = useQuery({
     queryKey: ['portfolio'],
@@ -42,7 +43,8 @@ export default function DashboardPage() {
       const statusOk = filterStatus === 'All' || s.status === filterStatus;
       const typeOk = filterType === 'All' || s.asset_type === filterType;
       const portOk = filterPort === 'All' || s.port_type === filterPort;
-      return statusOk && typeOk && portOk;
+      const searchOk = searchQuery === '' || s.symbol.toUpperCase().includes(searchQuery.toUpperCase());
+      return statusOk && typeOk && portOk && searchOk;
     });
 
     result = result.sort((a, b) => {
@@ -64,7 +66,7 @@ export default function DashboardPage() {
     });
 
     return result;
-  }, [stocks, filterStatus, filterType, filterPort, activeSort]);
+  }, [stocks, filterStatus, filterType, filterPort, activeSort, searchQuery]);
 
   // Portfolio summary stats (Now calculated from filtered stocks)
   const totalInvested = filtered.reduce((a, s) => a + s.total_invested, 0);
@@ -211,6 +213,8 @@ export default function DashboardPage() {
           onAssetTypeChange={setFilterType}
           onPortChange={setFilterPort}
           onSortChange={setActiveSort}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
           activeStatus={filterStatus}
           activeType={filterType}
           activePort={filterPort}

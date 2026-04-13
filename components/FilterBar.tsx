@@ -9,6 +9,8 @@ interface FilterBarProps {
   onAssetTypeChange: (type: AssetType | 'All') => void;
   onPortChange: (port: PortType | 'All') => void;
   onSortChange: (sort: string) => void;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
   activeStatus: StockStatus | 'All';
   activeType: AssetType | 'All';
   activePort: PortType | 'All';
@@ -26,12 +28,16 @@ export function FilterBar({
   activeType,
   activePort,
   activeSort,
+  searchQuery,
+  onSearchChange,
   totalCount,
   filteredCount,
 }: FilterBarProps) {
   return (
     <div style={{ marginBottom: '24px' }}>
-      {/* Port Type row */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+        <div style={{ flex: 1, minWidth: '300px' }}>
+          {/* Port Type row */}
       <div style={{ marginBottom: '10px' }}>
         <div style={{ fontSize: '10px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>
           Filter by Port Type
@@ -133,9 +139,39 @@ export function FilterBar({
           </select>
         </div>
       </div>
+      </div> {/* Close the left column */}
+
+      {/* Search Input right column */}
+      <div style={{ marginBottom: '10px', flex: '1', minWidth: '200px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'flex-start' }}>
+        <div style={{ width: '100%', maxWidth: '250px' }}>
+          <div style={{ fontSize: '10px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>
+            Search Symbol
+          </div>
+          <div>
+            <input 
+              type="text"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value.toUpperCase())}
+              placeholder="e.g. PTT, CPALL, TISCO"
+              style={{
+                background: 'var(--bg-primary)', 
+                color: 'var(--text-primary)', 
+                border: '1px solid var(--border)', 
+                padding: '8px 12px', 
+                borderRadius: '4px',
+                fontFamily: 'Space Mono, monospace',
+                fontSize: '13px',
+                outline: 'none',
+                width: '100%',
+              }}
+            />
+          </div>
+        </div>
+      </div>
+      </div> {/* Close main flex row */}
 
       {/* Result count */}
-      <div style={{ marginTop: '16px', fontSize: '11px', color: 'var(--text-secondary)' }}>
+      <div style={{ marginTop: '16px', fontSize: '11px', color: 'var(--text-secondary)', borderTop: '1px solid var(--border-bright)', paddingTop: '12px' }}>
         <span className="mono" style={{ color: 'var(--amber)' }}>{filteredCount}</span>
         <span> of </span>
         <span className="mono">{totalCount}</span>
