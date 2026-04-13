@@ -65,20 +65,6 @@ export function BuyRoundTable({
 
   return (
     <div>
-      {/* Summary mini row */}
-      <div className="stats-grid" style={{ marginBottom: '20px' }}>
-        {[
-          { label: 'หุ้นรวม', value: `${formatNumber(totalShares, 0)} หุ้น`, color: 'var(--text-primary)' },
-          { label: 'เงินลงทุนรวม', value: formatCurrency(totalInvested), color: 'var(--amber)' },
-          { label: 'ต้นทุนเฉลี่ย', value: avgCost > 0 ? formatCurrency(avgCost) : '—', color: 'var(--amber)' },
-        ].map((item) => (
-          <div key={item.label} className="stat-card" style={{ padding: '14px' }}>
-            <div className="stat-label">{item.label}</div>
-            <div className="mono" style={{ fontSize: '16px', fontWeight: 700, color: item.color }}>{item.value}</div>
-          </div>
-        ))}
-      </div>
-
       {/* Table header + Add button */}
       <div className="panel">
         <div className="panel-header">
