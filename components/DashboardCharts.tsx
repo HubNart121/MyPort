@@ -121,21 +121,21 @@ export function DashboardCharts({ portData, sectorData, assetData, stackedData }
 
   const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }: any) => {
     const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const radius = Math.max(outerRadius + 15, 85);
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-    if (percent < 0.05) return null; // Don't show labels for very small slices
+    if (percent < 0.01) return null;
 
     return (
       <text 
         x={x} 
         y={y} 
-        fill="white" 
-        textAnchor="middle" 
+        fill="var(--text-secondary)" 
+        textAnchor={x > cx ? 'start' : 'end'} 
         dominantBaseline="central"
         className="mono"
-        style={{ fontSize: '10px', fontWeight: 700, pointerEvents: 'none' }}
+        style={{ fontSize: '11px', fontWeight: 700 }}
       >
         {`${(percent * 100).toFixed(0)}%`}
       </text>
@@ -228,13 +228,13 @@ export function DashboardCharts({ portData, sectorData, assetData, stackedData }
                     data={portData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
+                    innerRadius={50}
+                    outerRadius={70}
                     paddingAngle={5}
                     dataKey="value"
                     stroke="none"
                     label={renderCustomizedLabel}
-                    labelLine={false}
+                    labelLine={{ stroke: 'var(--text-muted)', strokeWidth: 1 }}
                   >
                     {portData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -265,13 +265,13 @@ export function DashboardCharts({ portData, sectorData, assetData, stackedData }
                     data={sectorData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
+                    innerRadius={50}
+                    outerRadius={70}
                     paddingAngle={5}
                     dataKey="value"
                     stroke="none"
                     label={renderCustomizedLabel}
-                    labelLine={false}
+                    labelLine={{ stroke: 'var(--text-muted)', strokeWidth: 1 }}
                   >
                     {sectorData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
@@ -302,13 +302,13 @@ export function DashboardCharts({ portData, sectorData, assetData, stackedData }
                     data={assetData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
+                    innerRadius={50}
+                    outerRadius={70}
                     paddingAngle={5}
                     dataKey="value"
                     stroke="none"
                     label={renderCustomizedLabel}
-                    labelLine={false}
+                    labelLine={{ stroke: 'var(--text-muted)', strokeWidth: 1 }}
                   >
                     {assetData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[(index + 4) % COLORS.length]} />
