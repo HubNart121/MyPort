@@ -25,6 +25,7 @@ export default function DashboardPage() {
   const [filterStatus, setFilterStatus] = useState<StockStatus | 'All'>('All');
   const [filterType, setFilterType] = useState<AssetType | 'All'>('All');
   const [filterPort, setFilterPort] = useState<PortType | 'All'>('All');
+  const [activeSort, setActiveSort] = useState<string>('created_desc');
 
   const { data: rawStocks = [], isLoading, error } = useQuery({
     queryKey: ['portfolio'],
@@ -36,15 +37,34 @@ export default function DashboardPage() {
     [rawStocks]
   );
 
-  const filtered = useMemo(() =>
-    stocks.filter((s) => {
+  const filtered = useMemo(() => {
+    let result = stocks.filter((s) => {
       const statusOk = filterStatus === 'All' || s.status === filterStatus;
       const typeOk = filterType === 'All' || s.asset_type === filterType;
       const portOk = filterPort === 'All' || s.port_type === filterPort;
       return statusOk && typeOk && portOk;
-    }),
-    [stocks, filterStatus, filterType, filterPort]
-  );
+    });
+
+    result = result.sort((a, b) => {
+      switch (activeSort) {
+        case 'symbol_asc':
+          return a.symbol.localeCompare(b.symbol);
+        case 'invested_desc':
+          return b.total_invested - a.total_invested;
+        case 'profit_desc':
+          return b.expected_profit - a.expected_profit;
+        case 'profit_asc':
+          return a.expected_profit - b.expected_profit;
+        case 'yield_desc':
+          return (b.div_yield || 0) - (a.div_yield || 0);
+        case 'created_desc':
+        default:
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+    });
+
+    return result;
+  }, [stocks, filterStatus, filterType, filterPort, activeSort]);
 
   // Portfolio summary stats (Now calculated from filtered stocks)
   const totalInvested = filtered.reduce((a, s) => a + s.total_invested, 0);
@@ -190,9 +210,11 @@ export default function DashboardPage() {
           onStatusChange={setFilterStatus}
           onAssetTypeChange={setFilterType}
           onPortChange={setFilterPort}
+          onSortChange={setActiveSort}
           activeStatus={filterStatus}
           activeType={filterType}
           activePort={filterPort}
+          activeSort={activeSort}
           totalCount={stocks.length}
           filteredCount={filtered.length}
         />

@@ -8,9 +8,11 @@ interface FilterBarProps {
   onStatusChange: (status: StockStatus | 'All') => void;
   onAssetTypeChange: (type: AssetType | 'All') => void;
   onPortChange: (port: PortType | 'All') => void;
+  onSortChange: (sort: string) => void;
   activeStatus: StockStatus | 'All';
   activeType: AssetType | 'All';
   activePort: PortType | 'All';
+  activeSort: string;
   totalCount: number;
   filteredCount: number;
 }
@@ -19,9 +21,11 @@ export function FilterBar({
   onStatusChange,
   onAssetTypeChange,
   onPortChange,
+  onSortChange,
   activeStatus,
   activeType,
   activePort,
+  activeSort,
   totalCount,
   filteredCount,
 }: FilterBarProps) {
@@ -99,8 +103,39 @@ export function FilterBar({
         </div>
       </div>
 
+      {/* Sort By row */}
+      <div style={{ marginBottom: '10px' }}>
+        <div style={{ fontSize: '10px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>
+          Sort By
+        </div>
+        <div>
+          <select 
+            value={activeSort}
+            onChange={(e) => onSortChange(e.target.value)}
+            style={{ 
+              background: 'var(--bg-primary)', 
+              color: 'var(--text-primary)', 
+              border: '1px solid var(--border)', 
+              padding: '6px 12px', 
+              borderRadius: '2px',
+              fontFamily: 'Space Mono, monospace',
+              fontSize: '11px',
+              outline: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="created_desc">Latest Added (Default)</option>
+            <option value="symbol_asc">Symbol (A-Z)</option>
+            <option value="invested_desc">Invested Amount (High-Low)</option>
+            <option value="profit_desc">Expected Profit (High-Low)</option>
+            <option value="profit_asc">Expected Profit (Low-High)</option>
+            <option value="yield_desc">Div Yield (High-Low)</option>
+          </select>
+        </div>
+      </div>
+
       {/* Result count */}
-      <div style={{ marginTop: '10px', fontSize: '11px', color: 'var(--text-secondary)' }}>
+      <div style={{ marginTop: '16px', fontSize: '11px', color: 'var(--text-secondary)' }}>
         <span className="mono" style={{ color: 'var(--amber)' }}>{filteredCount}</span>
         <span> of </span>
         <span className="mono">{totalCount}</span>
