@@ -267,22 +267,23 @@ export default function StockDetailPage({ params }: PageProps) {
         {/* Summary Cards */}
         <div className="animate-stagger stats-grid">
           <div className="stat-card">
-            <div className="stat-label">หุ้นรวม</div>
+            <div className="stat-label">หุ้นทั้งหมด</div>
             <div className="stat-value mono">
-              {formatNumber(stats.total_shares, 0)} หุ้น
+              {formatNumber(stats.total_shares, 0)}
             </div>
-            <div className="stat-sub">ทั้งหมดที่ถือครองอยู่</div>
+            <div className="stat-sub">หน่วย: หุ้น</div>
           </div>
           <div className="stat-card">
             <div className="stat-label">ต้นทุนเฉลี่ย</div>
             <div className="stat-value amber mono">
               {stats.total_shares > 0 ? formatCurrency(stats.avg_cost) : '—'}
             </div>
-            <div className="stat-sub">บาท / หุ้น</div>
+            <div className="stat-sub">ต่อหุ้น</div>
           </div>
           <div className="stat-card">
             <div className="stat-label">เงินลงทุนรวม</div>
             <div className="stat-value mono">{stats.total_shares > 0 ? formatCurrency(stats.total_invested) : '—'}</div>
+            <div className="stat-sub">Current Invested</div>
           </div>
           <div className="stat-card">
             <div className="stat-label">อัตราปันผลคาดการณ์</div>
