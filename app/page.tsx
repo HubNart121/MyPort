@@ -84,6 +84,29 @@ export default function DashboardPage() {
     return Object.entries(map).map(([name, value]) => ({ name, value }));
   }, [filtered]);
 
+  const stackedData = useMemo(() => {
+    const portMap: Record<string, any> = {};
+    const sectorSet = new Set<string>();
+    
+    filtered.forEach(s => {
+      if (s.total_invested <= 0) return;
+      const port = s.port_type;
+      const sector = s.sector || 'Other';
+      sectorSet.add(sector);
+      
+      if (!portMap[port]) {
+        portMap[port] = { name: port, total: 0 };
+      }
+      portMap[port][sector] = (portMap[port][sector] || 0) + s.total_invested;
+      portMap[port].total += s.total_invested;
+    });
+    
+    return {
+      data: Object.values(portMap).sort((a, b) => b.total - a.total),
+      sectors: Array.from(sectorSet).sort()
+    };
+  }, [filtered]);
+
   if (isLoading) {
     return (
       <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>
@@ -157,6 +180,7 @@ export default function DashboardPage() {
           portData={portData} 
           sectorData={sectorData} 
           assetData={assetData} 
+          stackedData={stackedData}
         />
 
         <div className="divider" />
