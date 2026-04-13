@@ -9,6 +9,7 @@ import type { BuyRoundFormData } from './BuyRoundForm';
 interface BuyRoundTableProps {
   rounds: BuyRound[];
   onAdd: (data: BuyRoundFormData) => Promise<void>;
+  onEdit: (id: string, data: BuyRoundFormData) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   avgCost: number;
   totalShares: number;
@@ -20,12 +21,14 @@ export type { BuyRoundFormData };
 export function BuyRoundTable({
   rounds,
   onAdd,
+  onEdit,
   onDelete,
   avgCost,
   totalShares,
   totalInvested,
 }: BuyRoundTableProps) {
   const [showForm, setShowForm] = useState(false);
+  const [editingRound, setEditingRound] = useState<BuyRound | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -34,6 +37,17 @@ export function BuyRoundTable({
     try {
       await onAdd(data);
       setShowForm(false);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const onEditSubmit = async (data: BuyRoundFormData) => {
+    if (!editingRound) return;
+    setSaving(true);
+    try {
+      await onEdit(editingRound.id, data);
+      setEditingRound(null);
     } finally {
       setSaving(false);
     }
@@ -90,6 +104,26 @@ export function BuyRoundTable({
           </div>
         )}
 
+        {/* Edit Modal */}
+        {editingRound && (
+          <div className="modal-overlay">
+            <div className="modal" style={{ maxWidth: '480px' }}>
+              <div className="modal-header">
+                <div className="modal-title mono">EDIT BUY ROUND</div>
+                <button className="btn btn-ghost" onClick={() => setEditingRound(null)}>✕</button>
+              </div>
+              <div className="modal-body">
+                <BuyRoundForm
+                  initialData={editingRound}
+                  onSubmit={onEditSubmit}
+                  onCancel={() => setEditingRound(null)}
+                  loading={saving}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Rounds list/table */}
         {rounds.length === 0 ? (
           <div className="empty-state">
@@ -130,14 +164,24 @@ export function BuyRoundTable({
                         {formatCurrency(runningAvg)}
                       </td>
                       <td style={{ textAlign: 'right' }}>
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          style={{ color: 'var(--red)' }}
-                          onClick={() => handleDelete(r.id)}
-                          disabled={deleting === r.id}
-                        >
-                          {deleting === r.id ? '...' : '✕'}
-                        </button>
+                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            style={{ color: 'var(--text-secondary)' }}
+                            onClick={() => setEditingRound(r)}
+                            disabled={!!deleting}
+                          >
+                            ✎
+                          </button>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            style={{ color: 'var(--red)' }}
+                            onClick={() => handleDelete(r.id)}
+                            disabled={deleting === r.id}
+                          >
+                            {deleting === r.id ? '...' : '✕'}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -166,8 +210,11 @@ export function BuyRoundTable({
                       <div className="mono" style={{ fontWeight: 700 }}>{formatCurrency(r.price * r.shares)}</div>
                       <div className="mono" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Avg: {formatCurrency(runningAvg)}</div>
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <button className="btn btn-ghost" onClick={() => handleDelete(r.id)}>✕</button>
+                    <div style={{ textAlign: 'right', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                      <button className="btn btn-ghost" onClick={() => setEditingRound(r)} disabled={!!deleting}>✎</button>
+                      <button className="btn btn-ghost" onClick={() => handleDelete(r.id)} disabled={deleting === r.id}>
+                        {deleting === r.id ? '...' : '✕'}
+                      </button>
                     </div>
                   </div>
                 );

@@ -96,6 +96,22 @@ export default function StockDetailPage({ params }: PageProps) {
     queryClient.invalidateQueries({ queryKey: ['portfolio'] });
   };
 
+  const handleEditRound = async (roundId: string, data: BuyRoundFormData) => {
+    const supabase = getSupabase();
+    const { error: err } = await supabase
+      .from('buy_rounds')
+      .update({
+        buy_date: data.buy_date,
+        price: data.price,
+        shares: data.shares,
+      })
+      .eq('id', roundId);
+    if (err) { toast.show(err.message, 'error'); throw err; }
+    toast.show('แก้ไขรอบซื้อสำเร็จ', 'success');
+    queryClient.invalidateQueries({ queryKey: ['stock', id] });
+    queryClient.invalidateQueries({ queryKey: ['portfolio'] });
+  };
+
   const handleSell = async (data: SellFormData & { profit: number; avg_cost_at_sell: number }) => {
     setSelling(true);
     const supabase = getSupabase();
@@ -286,10 +302,10 @@ export default function StockDetailPage({ params }: PageProps) {
           </div>
         )}
 
-        {/* Buy Round Table */}
         <BuyRoundTable
           rounds={rounds}
           onAdd={handleAddRound}
+          onEdit={handleEditRound}
           onDelete={handleDeleteRound}
           avgCost={stats.avg_cost}
           totalShares={stats.total_shares}
