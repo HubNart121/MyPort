@@ -131,11 +131,11 @@ export function DashboardCharts({ portData, sectorData, assetData, stackedData }
       <text 
         x={x} 
         y={y} 
-        fill="var(--text-secondary)" 
+        fill="white" 
         textAnchor={x > cx ? 'start' : 'end'} 
         dominantBaseline="central"
         className="mono"
-        style={{ fontSize: '11px', fontWeight: 700 }}
+        style={{ fontSize: '12px', fontWeight: 700 }}
       >
         {`${(percent * 100).toFixed(0)}%`}
       </text>
