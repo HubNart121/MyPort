@@ -35,14 +35,21 @@ export function logout() {
 
 export async function updateCredentials(user: string, pass: string) {
   const supabase = getSupabase();
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('auth_config')
-    .update({ 
+    .upsert({ 
+      id: 1,
       username: user, 
       password: pass,
       updated_at: new Date().toISOString()
     })
-    .eq('id', 1);
+    .select();
 
-  return !error;
+  if (error) {
+    console.error('Update Credentials Error:', error);
+    return false;
+  }
+
+  // Double check if data was actually returned/updated
+  return data && data.length > 0;
 }
