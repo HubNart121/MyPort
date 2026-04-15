@@ -113,3 +113,23 @@ CREATE POLICY "Enable all access for auth_config" ON auth_config
 INSERT INTO auth_config (id, username, password) 
 VALUES (1, 'admin', 'admin')
 ON CONFLICT (id) DO NOTHING;
+
+-- 10. Create login_logs table
+CREATE TABLE IF NOT EXISTS login_logs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  username TEXT,
+  ip_address TEXT,
+  device TEXT,
+  device_type TEXT,
+  status TEXT CHECK (status IN ('Success', 'Failed'))
+);
+
+ALTER TABLE login_logs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Enable all access for login_logs" ON login_logs
+  FOR ALL
+  USING (true)
+  WITH CHECK (true);
+
+CREATE INDEX IF NOT EXISTS idx_login_logs_created_at ON login_logs(created_at DESC);

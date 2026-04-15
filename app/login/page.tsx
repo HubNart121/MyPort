@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { verifyCredentials, isLoggedIn } from '@/lib/auth';
+import { logLoginAttempt } from '@/lib/logger';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -24,6 +25,9 @@ export default function LoginPage() {
 
     try {
       const success = await verifyCredentials(username, password);
+      // Log the attempt
+      await logLoginAttempt(username, success ? 'Success' : 'Failed');
+
       if (success) {
         router.push('/');
         router.refresh(); // Ensure state updates

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Providers } from './providers';
 import { SidebarManager } from '@/components/Sidebar';
+import { AuthGuard } from '@/components/AuthGuard';
 
 export const metadata: Metadata = {
   title: 'PORT_TRACK — Stock Portfolio Manager',
@@ -13,12 +14,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="th">
       <body className="font-outfit">
         <Providers>
-          <div className="app-layout">
-            <SidebarManager />
-            <main className="main-content">
-              {children}
-            </main>
-          </div>
+          <AuthGuard>
+            <div className="app-layout">
+              <SidebarManager />
+              <main className="main-content">
+                {children}
+              </main>
+            </div>
+          </AuthGuard>
         </Providers>
       </body>
     </html>

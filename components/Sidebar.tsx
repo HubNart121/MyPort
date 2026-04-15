@@ -102,6 +102,18 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <span className="mono" style={{ fontSize: '12px', width: '14px', textAlign: 'center' }}>⚙</span>
             Change User/Pass
           </Link>
+          <Link 
+            href="/settings/logs" 
+            className={`nav-item ${pathname === '/settings/logs' ? 'active' : ''}`}
+            onClick={() => {
+              if (typeof window !== 'undefined' && window.innerWidth <= 768 && onClose) {
+                onClose();
+              }
+            }}
+          >
+            <span className="mono" style={{ fontSize: '12px', width: '14px', textAlign: 'center' }}>▤</span>
+            Access Logs
+          </Link>
           <button 
             onClick={() => {
               if (confirm('ต้องการออกจากระบบใช่หรือไม่?')) {
