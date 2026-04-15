@@ -6,17 +6,11 @@ import { isLoggedIn } from '@/lib/auth';
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const pathname = usePathname();
-  const [authorized, setAuthorized] = useState(false);
-  const [mounted, setMounted] = useState(false);
+    // Whitelist diagnostic and login pages
+    const isPublicPage = pathname === '/login' || pathname === '/debug/auth' || pathname === '/diag';
 
-  useEffect(() => {
-    setMounted(true);
-    // Check if user is logged in
-    const authStatus = isLoggedIn();
-    
-    // If not at /login and not logged in, redirect to /login
-    if (!authStatus && pathname !== '/login') {
+    // If not at public page and not logged in, redirect to /login
+    if (!authStatus && !isPublicPage) {
       setAuthorized(false);
       router.push('/login');
     } else {
@@ -27,8 +21,9 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   // Prevent hydration error by waiting for mount
   if (!mounted) return null;
 
-  // If we are at /login, just show it
-  if (pathname === '/login') {
+  // If we are at a public page, just show it
+  const isPublicPage = pathname === '/login' || pathname === '/debug/auth' || pathname === '/diag';
+  if (isPublicPage) {
     return <>{children}</>;
   }
 
