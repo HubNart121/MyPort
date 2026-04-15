@@ -12,7 +12,7 @@ export async function verifyCredentials(user: string, pass: string) {
 
   if (error || !data) return false;
 
-  const isValid = data.username === user && data.password === pass;
+  const isValid = data.username.trim() === user.trim() && data.password.trim() === pass.trim();
   
   if (isValid) {
     // Save to localStorage for persistence
@@ -39,8 +39,8 @@ export async function updateCredentials(user: string, pass: string) {
     .from('auth_config')
     .upsert({ 
       id: 1,
-      username: user, 
-      password: pass,
+      username: user.trim(), 
+      password: pass.trim(),
       updated_at: new Date().toISOString()
     })
     .select();
