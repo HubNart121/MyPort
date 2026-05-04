@@ -6,10 +6,15 @@ import { isLoggedIn } from '@/lib/auth';
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-    // Whitelist diagnostic and login pages
+  const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+  const [authorized, setAuthorized] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const authStatus = isLoggedIn();
     const isPublicPage = pathname === '/login' || pathname === '/debug/auth' || pathname === '/diag';
 
-    // If not at public page and not logged in, redirect to /login
     if (!authStatus && !isPublicPage) {
       setAuthorized(false);
       router.push('/login');
@@ -18,20 +23,17 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     }
   }, [pathname, router]);
 
-  // Prevent hydration error by waiting for mount
   if (!mounted) return null;
 
-  // If we are at a public page, just show it
   const isPublicPage = pathname === '/login' || pathname === '/debug/auth' || pathname === '/diag';
   if (isPublicPage) {
     return <>{children}</>;
   }
 
-  // If not authorized yet, show nothing or a loader
   if (!authorized) {
     return (
-      <div className="flex items-center justify-center min-vh-100 bg-page">
-        <div className="mono amber animate-pulse">VERIFYING ACCESS...</div>
+      <div className="flex items-center justify-center min-h-screen bg-slate-900" style={{ minHeight: '100vh' }}>
+        <div className="mono animate-pulse" style={{ color: 'var(--amber)' }}>VERIFYING ACCESS...</div>
       </div>
     );
   }
