@@ -15,8 +15,10 @@ export async function verifyCredentials(user: string, pass: string) {
   const isValid = data.username.trim() === user.trim() && data.password.trim() === pass.trim();
   
   if (isValid) {
-    // Save to localStorage for persistence
-    localStorage.setItem(AUTH_KEY, 'true');
+    // Save to localStorage for legacy components
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(AUTH_KEY, 'true');
+    }
   }
   
   return isValid;
@@ -28,9 +30,10 @@ export function isLoggedIn() {
 }
 
 export function logout() {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem(AUTH_KEY);
-  window.location.href = '/login';
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(AUTH_KEY);
+    // Let the caller handle redirection or call server action
+  }
 }
 
 export async function updateCredentials(user: string, pass: string) {
@@ -50,6 +53,5 @@ export async function updateCredentials(user: string, pass: string) {
     return false;
   }
 
-  // Double check if data was actually returned/updated
   return data && data.length > 0;
 }

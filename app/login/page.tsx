@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { verifyCredentials, isLoggedIn } from '@/lib/auth';
+import { isLoggedIn } from '@/lib/auth';
 import { logLoginAttempt } from '@/lib/logger';
+import { loginAction } from '@/lib/actions/auth';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -24,15 +25,21 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const success = await verifyCredentials(username, password);
+      const result = await loginAction(username, password);
+      
       // Log the attempt
-      await logLoginAttempt(username, success ? 'Success' : 'Failed');
+      await logLoginAttempt(username, result.success ? 'Success' : 'Failed');
 
-      if (success) {
+      if (result.success) {
+        // Update local storage for legacy client components IF needed
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('port_track_auth_session', 'true');
+        }
+        
         router.push('/');
-        router.refresh(); // Ensure state updates
+        router.refresh(); 
       } else {
-        setError('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
+        setError(result.error || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
       }
     } catch (err) {
       setError('เกิดข้อผิดพลาดในการเชื่อมต่อ');

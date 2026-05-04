@@ -3,8 +3,11 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { logout } from '@/lib/auth';
+import { logoutAction } from '@/lib/actions/auth';
+import { useRouter } from 'next/navigation';
 
 const navItems = [
+// ... (rest of the preamble)
   { href: '/', label: 'Dashboard', icon: '◈' },
   { href: '/stocks/new', label: 'Add Stock', icon: '+' },
   { href: '/history', label: 'Trading History', icon: '▤' },
