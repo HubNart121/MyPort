@@ -13,6 +13,8 @@ export function StockCard({ stock }: StockCardProps) {
   const profitClass =
     stock.expected_profit > 0 ? 'profit' : stock.expected_profit < 0 ? 'loss' : 'neutral';
 
+  const computed_dividend = (stock.dividend_per_share || 0) * (stock.total_shares || 0);
+
   return (
     <Link
       href={`/stocks/${stock.id}`}
@@ -59,8 +61,8 @@ export function StockCard({ stock }: StockCardProps) {
         <div className="mono" style={{ color: 'var(--green)', fontWeight: 700 }}>
           {stock.dividend_yield_pct > 0 ? `${formatNumber(stock.dividend_yield_pct)}%` : '—'}
         </div>
-        <div className="mono" style={{ fontSize: '12px', color: 'var(--green)', fontWeight: 600 }}>
-          {stock.total_dividend > 0 ? `฿${formatNumber(stock.total_dividend)}` : ''}
+        <div className="mono" style={{ fontSize: '11px', color: 'var(--green)', fontWeight: 600, marginTop: '1px' }}>
+          {computed_dividend > 0 ? `฿${formatNumber(computed_dividend)}` : ''}
         </div>
         <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
           {stock.dividend_per_share > 0 ? `฿${formatNumber(stock.dividend_per_share, 4)}/share` : ''}
