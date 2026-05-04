@@ -51,7 +51,7 @@ export function StockCard({ stock }: StockCardProps) {
         </div>
       </div>
 
-      {/* Dividend */}
+      {/* Dividend - Trigger Rebuild */}
       <div className="tablet-hide">
         <div className="internal-label" style={{ fontSize: '10px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '3px' }}>
           Div Yield
