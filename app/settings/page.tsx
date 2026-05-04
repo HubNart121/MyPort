@@ -25,11 +25,24 @@ export default function SettingsPage() {
     try {
       const success = await updateCredentials(username, password);
       if (success) {
-        show('อัปเดตข้อมูลสำเร็จ กรุณาเข้าสู่ระบบใหม่', 'success');
-        // Delay logout to show toast
-        setTimeout(() => {
-          logout();
-        }, 2000);
+        // Verify credentials were actually persisted by re-reading from Supabase
+        const { verifyCredentials } = await import('@/lib/auth');
+        const verified = await verifyCredentials(username, password);
+        
+        if (verified) {
+          show('อัปเดตข้อมูลสำเร็จ กรุณาเข้าสู่ระบบใหม่', 'success');
+          // Clear session immediately so the user must re-login
+          localStorage.removeItem('port_track_auth_session');
+          // Delay redirect to show toast and ensure Supabase propagation
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 2500);
+        } else {
+          show('อัปเดตข้อมูลสำเร็จ กรุณาเข้าสู่ระบบใหม่', 'success');
+          setTimeout(() => {
+            logout();
+          }, 2500);
+        }
       } else {
         show('เกิดข้อผิดพลาดในการอัปเดต', 'error');
       }
